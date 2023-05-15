@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const Folder = ({ explorer, handleInsertNode }) => {
+const Folder = ({ explorer, handleNode , id}) => {
 
   const [expand, setExpand] = useState(false)
   const [showInput, setShowInput] = useState({ visible: false, isFolder: null })
@@ -18,15 +18,28 @@ const Folder = ({ explorer, handleInsertNode }) => {
 
   const addFolder = (e) => {
     if (e.keyCode === 13 && e.target.value) {
-      handleInsertNode(explorer.id, e.target.value, showInput.isFolder)
+      handleNode(explorer.id, e.target.value, showInput.isFolder,'insert')
 
       setShowInput({ ...showInput, visible: false })
     }
   }
 
 
+  const handleDelete = (e) =>{
+    e.stopPropagation();
+    handleNode(explorer.id, e.target.value, showInput.isFolder,'delete')
+  }
 
-  if (explorer.isFolder) {
+  if (explorer.isFile) {    
+    return <div className='file'>
+    <span>📄 {explorer.name}</span>
+    <div>
+    <button onClick={(e) => handleDelete(e)}>🗑️</button>
+    </div>
+    </div>
+  }
+
+  else if(explorer.isFolder) {
     return (
       <div style={{ marginTop: 5 }}>
         <div className='folder' onClick={() => setExpand(!expand)}>
@@ -34,6 +47,8 @@ const Folder = ({ explorer, handleInsertNode }) => {
           <div>
             <button onClick={(e) => handleButtons(e, true)}>📁+</button>
             <button onClick={(e) => handleButtons(e, false)}>📄+</button>
+            <button onClick={(e) => handleDelete(e)}>🗑️</button>
+
           </div>
 
         </div>
@@ -62,13 +77,10 @@ const Folder = ({ explorer, handleInsertNode }) => {
 
           {explorer.items.map((exp) => {
             {/* recursively rendering the UI */ }
-            return <Folder explorer={exp} handleInsertNode={handleInsertNode} key={exp.id} />
+            return <Folder explorer={exp} handleNode={handleNode} key={exp.id} />
           })}
         </div>
       </div>)
-  }
-  else {
-    return <div className='file'>📄 {explorer.name}</div>
   }
 
 
